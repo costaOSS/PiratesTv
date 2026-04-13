@@ -2,86 +2,68 @@ import os
 import requests
 import re
 
-INDIAN_GROUPS = ['Hindi', 'Hindi Movies', 'Hindi Music', 'Indian Bangla News', 
-                'Kolkata Bangla', 'Kolkata Bangla Movies', 'Punjabi', 'Tamil',
-                'Telugu', 'Malayalam', 'Kannada', 'Marathi', 'Gujarati', 'Bengali',
-                'Sports', 'PSL 2026', 'LiveSports', 'DD Sports']
+INDIAN_KEYWORDS = [
+    'Hindi', 'Bollywood', 'India', 'Indian',
+    'Star Plus', 'Star Gold', 'Star Movies', 'Star Sports', 'Star Cricket', 'Star World',
+    'Sony TV', 'Sony Max', 'Sony Max 2', 'Sony Ten', 'Sony Six', 'Sony Pal', 'Sony SAB',
+    'Colors TV', 'Colors HD', 'Colors Bangla', 'Colors Marathi', 'Colors Tamil', 'Colors Kannada', 'Colors Infinity',
+    'Zee TV', 'Zee HD', 'Zee Cinema', 'Zee Action', 'Zee Anmol', 'Zee Bangla', 'Zee Tamil', 'Zee Yuva',
+    'DD National', 'DD News', 'DD India', 'DD Sports', 'Doordarshan',
+    'NDTV', 'Aaj Tak', 'Republic', 'Times Now', 'India Today', 'ABP', 'News18', 'TV9',
+    'ETV', 'ETV HD', 'ETV Plus', 'ETV Cinema', 'ETV Life',
+    '9XM', '9X', 'B4U', 'MTV', 'MTV India',
+    'Sun TV', 'Sun News', 'Jaya', 'Asianet', 'Asianet Plus', 'Surya', 'Mazhavil',
+    'Gemini TV', 'Polimer', 'Captain', 'Kumari',
+    'Goldmines', 'Manoranjan', 'Zee Classic', 'And Pictures',
+    'Ten 1', 'Ten 2', 'Ten 3', 'Ten Sports',
+    'Hotstar', 'Jio', 'Tata Play', 'Airtel',
+    'Sahara One', 'Maha',
+    'Star Pravah', 'Star Jalsha',
+    'DD Malayalam', 'DD Tamil', 'DD Telugu', 'DD Kannada', 'DD Marathi', 'DD Gujarati', 'DD Punjabi', 'DD Chandana'
+]
 
-INDIAN_KEYWORDS = ['India', 'Hindi', 'Bollywood', 'DD Sports', 'Star Sports',
-                  'Sony', 'Colors', 'Zee', 'Sun', 'Star Plus', 'Star Gold',
-                  'Star Movies', 'And', 'B4U', 'Sahara', 'ETV', 'ABN',
-                  'NDTV', 'Aaj Tak', 'Republic', 'Times Now', 'India Today',
-                  'ABP', 'News18', 'TV9', 'Doordarshan', 'DD', 'Soni',
-                  'TV', 'Star', 'Zee TV', 'MTV', '9XM', '9X', 'Etv', 'GEM',
-                  'Goldmines', 'Manoranjan', 'Zee Action', 'Zee Classic',
-                  'Zee Bollywood', 'Zee Cinema', 'Zee Anmol', 'Sony Pal',
-                  'Sony SAB', 'Sony TV', 'Sony Max', 'Sony Max 2', 'Sony Ten',
-                  'Colors HD', 'Colors TV', 'Colors Infinity', 'Colors Bangla',
-                  'Colors Marathi', 'Colors Tamil', 'Colors Kannada', 'Colors HD',
-                  'ETV HD', 'ETV', 'Star Plus', 'Star Pravah', 'Star Jalsha',
-                  'Star Sports', 'Star Cricket', 'Star Movies', 'Star Gold',
-                  'Star World', 'Hotstar', 'Jio', 'Tata Play', 'Airtel',
-                  'Asianet', 'Surya', 'Kumari', 'Asianet Plus', 'Mazhavil',
-                  'Zee Tamil', 'Sun TV', 'Sun News', 'Jaya', 'Jaya Plus',
-                  'Polimer', 'Captain', 'Gemini', 'ETV Plus', 'ETV Life',
-                  'ETV Abhiruchi', 'ETV Cinema', 'Zee Yuva', 'Zee Bangla',
-                  'Star Sports 1', 'Star Sports 2', 'Star Sports 3',
-                  'Ten 1', 'Ten 2', 'Ten 3', 'Ten Sports', 'Sony Six',
-                  'Sony Ten', 'DD National', 'DD News', 'DD India', 'DD Urdu',
-                  'DD Chandana', 'DD Malayalam', 'DD Tamil', 'DD Telugu',
-                  'DD Kannada', 'DD Marathi', 'DD Gujarati', 'DD Punjabi']
-
-EXCLUDED_GROUPS = ['Bangladeshi', 'Bangla', 'Bangladeshi 🇧🇩', 'Pakistan', 'PSL 🇵🇰',
-                  'UK', 'USA', 'Arabic', 'Islamic', 'Cricket 🏏', 'Football',
-                  'English Movies', 'English News', 'Documentary', 'KIDS', 'Kids',
-                  'Promo', 'ISLAMIC CHANNELS', 'Bangla Movies', 'Bangla Music',
-                  'Relagion Channel', 'Roku', 'XUMO', 'LG', 'Vizio', 'Fire TV',
-                  'Redbox', 'DistroTV', 'Local Now', 'Tablo', 'Samsung', 'Xiaomi']
+EXCLUDED_GROUPS = [
+    'Bangladeshi', 'Bangladesh', 'Pakistan', 'Pakistani',
+    'UK', 'USA', 'United Kingdom', 'United States', 'Canada', 'Australia',
+    'Arabic', 'Islamic', 'Islamic Channel', 'Muslim',
+    'Football', 'Documentary',
+    'Kids', 'Cartoon', 'Anime',
+    'Music', 'Radio',
+    'Roku', 'XUMO', 'LG Channels', 'Vizio', 'Fire TV', 'Redbox', 'Tablo', 'Samsung TV', 'Xiaomi'
+]
 
 ADDITIONAL_SOURCES = [
+    'https://raw.githubusercontent.com/iptv-org/iptv/master/streams/in.m3u',
     'https://raw.githubusercontent.com/iptv-org/iptv/master/streams/in_distro.m3u',
     'https://raw.githubusercontent.com/iptv-org/iptv/master/streams/in_doordarshan.m3u',
     'https://raw.githubusercontent.com/iptv-org/iptv/master/streams/in_pishow.m3u',
     'https://raw.githubusercontent.com/iptv-org/iptv/master/streams/in_tango.m3u',
-    'https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u8',
-    'https://raw.githubusercontent.com/freecasthub/public-iptv/main/playlist.m3u',
-    'https://raw.githubusercontent.com/BuddyChewChew/app-m3u-generator/refs/heads/main/playlists/roku_all.m3u',
-    'https://iptv-org.github.io/iptv/index.m3u',
-    'https://apsattv.com/ssungusa.m3u',
-    'https://www.apsattv.com/xumo.m3u',
-    'https://www.apsattv.com/lg.m3u',
-    'https://www.apsattv.com/localnow.m3u',
-    'https://www.apsattv.com/redbox.m3u',
-    'https://www.apsattv.com/distro.m3u',
-    'https://www.apsattv.com/xiaomi.m3u',
-    'https://www.apsattv.com/vizio.m3u',
-    'https://www.apsattv.com/firetv.m3u',
-    'https://www.apsattv.com/cineverse.m3u',
-    'https://www.apsattv.com/tablo.m3u',
-    'https://www.apsattv.com/klowd.tv',
-    'https://tvpass.org/playlist/m3u',
 ]
 
-def is_indian_channel(channel_name, group):
-    group = group or ''
+def is_indian_channel(channel_name, group, url):
     channel_name = channel_name or ''
-    channel_name_lower = channel_name.lower()
+    group = group or ''
+    url = url or ''
+    
+    channel_lower = channel_name.lower()
     group_lower = group.lower()
+    url_lower = url.lower()
     
     for excluded in EXCLUDED_GROUPS:
         if excluded.lower() in group_lower:
             return False
     
-    if 'bd' in group_lower or 'bangladesh' in group_lower:
+    if 'bangladesh' in group_lower or ' bd ' in channel_lower or '.bd' in channel_lower:
         return False
     
-    for keyword in INDIAN_KEYWORDS:
-        if keyword.lower() in channel_name_lower:
-            return True
+    if any(kw.lower() in channel_lower for kw in INDIAN_KEYWORDS):
+        return True
     
-    for indian_group in INDIAN_GROUPS:
-        if indian_group.lower() in group_lower:
-            return True
+    if any(kw.lower() in group_lower for kw in ['hindi', 'punjabi', 'tamil', 'telugu', 'malayalam', 'kannada', 'marathi', 'gujarati', 'bengali', 'indian']):
+        return True
+    
+    if 'samsungin' in url_lower or 'amagi' in url_lower:
+        return True
     
     return False
 
@@ -100,7 +82,7 @@ def read_m3u_playlist(source):
             with open(source, 'r') as f:
                 content = f.read()
     except Exception as e:
-        print(f"Error fetching {source}: {e}")
+        print(f"Error: {e}")
         return []
 
     lines = content.split('\n')
@@ -120,7 +102,7 @@ def read_m3u_playlist(source):
             logo_match = re.search(r'tvg-logo="([^"]*)"', extinf)
             logo = logo_match.group(1) if logo_match else ''
             
-            if url and is_indian_channel(channel_name, group):
+            if url and is_indian_channel(channel_name, group, url):
                 if '.m3u8' in url or '.m3u' in url:
                     playlist.append({'logo': logo, 'group': group, 'channel_name': channel_name, 'url': url})
         i += 1
@@ -130,24 +112,24 @@ def read_m3u_playlist(source):
 
 def combine_playlists(all_sources):
     combined_playlist = []
-    seen_channels = set()
-    seen_names = set()
+    seen_urls = set()
+    seen_names_lower = set()
     
     for source in all_sources:
         source_playlist = read_m3u_playlist(source)
         for channel in source_playlist:
-            channel_name_clean = channel['channel_name'].strip().lower()
-            url_clean = channel['url'].strip()
+            url_clean = channel['url'].strip().lower()
+            name_clean = channel['channel_name'].strip().lower()
             
-            channel_identity = (channel_name_clean, url_clean)
+            if url_clean in seen_urls:
+                continue
             
-            if channel_identity not in seen_channels:
-                if channel_name_clean not in seen_names:
-                    seen_names.add(channel_name_clean)
-                    seen_channels.add(channel_identity)
-                    combined_playlist.append(channel)
-                else:
-                    seen_channels.add(channel_identity)
+            if name_clean in seen_names_lower:
+                continue
+            
+            seen_urls.add(url_clean)
+            seen_names_lower.add(name_clean)
+            combined_playlist.append(channel)
     
     return combined_playlist
 
@@ -167,7 +149,6 @@ def write_to_file(playlist, output_file, include_credits=False):
 if __name__ == "__main__":
     default_sources = [
         'https://raw.githubusercontent.com/FunctionError/PiratesTv/main/combined_playlist.m3u',
-        'https://raw.githubusercontent.com/iptv-org/iptv/master/streams/in.m3u'
     ] + ADDITIONAL_SOURCES
     
     output_file = 'combined_playlist.m3u'
