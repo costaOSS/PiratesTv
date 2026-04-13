@@ -20,43 +20,24 @@ INDIAN_KEYWORDS = [
     'Hotstar', 'Jio', 'Tata Play', 'Airtel',
     'Sahara One', 'Maha TV', 'Maha',
     'Star Pravah', 'Star Jalsha', 'Star Bharat',
-    'DD Malayalam', 'DD Tamil', 'DD Telugu', 'DD Kannada', 'DD Marathi', 'DD Gujarati', 'DD Punjabi', 'DD Chandana',
-    'KBS', 'Sahara', 'Shakti', 'Act',
-    'Aakaash', 'Aathavan', 'Adhyatm', 'AKD', 'Alankar', 'Amar', 'Amrita', 'Anand', 'Ananda', 'Angel',
-    'Bharat', 'Bhoomi', 'Bloomberg', 'Bollywood', 'Box', 'Britannia',
-    'Camera', 'Chardikla', 'Dabangg', 'Dahaad', 'Dhayi', 'Dilli', 'Divya',
-    'ETV Balaji', 'Fastway', 'Food', 'G',
-    'GNN', 'Gulistan', 'Gurukripa',
-    'HD', 'Himalaya',
-    ' IBC', 'Ichchapuran', 'Indl',
-    'Jan', 'Jhanjar', 'Jonack',
-    'Kall',
-    'Labistro', 'Lokmat',
-    'Madhav', 'Madhya', 'Magadan', 'Mahua', 'Malai', 'Manoranjan', 'Mathrubhumi', 'MBC',
-    'Mega', 'Mirror', 'MJ',
-    'Naada', 'Nadira', 'News', 'Nireeksha',
-    'Om', 'Orchid',
-    'Paras', 'Pehla', 'Platinum', 'Prakash', 'Prime', 'Punjab',
-    'Rangiya', 'Rising', 'RSTV',
-    'Sagarika', 'Sakshi', 'Samay', 'Sandesh', 'Sanskar', 'Shubhang', 'Sikkim', 'Sillunu', 'Sirippoli', 'Sonia', 'Sri',
-    'Tarang', 'Tazaa', 'Tehzeeb', 'Tippan', 'Travel', 'TV', 'TV5', 'TV9',
-    'Udaya', 'Ugc',
-    'V4', 'Vanity', 'Vasanth', 'Vijay', 'Vismay', 'Vividh',
-    'Wion',
-    'Zee', 'Zee24', 'ZeeMPC'
+    'DD Malayalam', 'DD Tamil', 'DD Telugu', 'DD Kannada', 'DD Marathi', 'DD Gujarati', 'DD Punjabi', 'DD Chandana'
 ]
 
 EXCLUDED_GROUPS = [
     'Bangladeshi', 'Bangladesh', 'Pakistan', 'Pakistani',
     'UK', 'USA', 'United Kingdom', 'United States', 'Canada', 'Australia',
-    'Arabic', 'Islamic', 'Islamic Channel', 'Muslim',
-    'Football', 'Documentary',
+    'Arabic', 'Islamic', 'Islamic Channel', 'Muslim', 'ISLAMIC',
+    'Football', 'Documentary', 'Infotainment',
     'Kids', 'Cartoon', 'Anime',
     'Music', 'Radio',
-    'Roku', 'XUMO', 'LG Channels', 'Vizio', 'Fire TV', 'Redbox', 'Tablo', 'Samsung TV', 'Xiaomi'
+    'Cricket', 'PSL', 'Live Sports',
+    'Bangladeshi 🇧🇩', 'Cricket 🏏', 'Football',
+    'English Movies', 'English News', 'NEWS INTERNASIONAL',
+    'Promo', 'Movies', 'Relagion'
 ]
 
 ADDITIONAL_SOURCES = [
+    'https://raw.githubusercontent.com/FunctionError/PiratesTv/main/combined_playlist.m3u',
     'https://raw.githubusercontent.com/iptv-org/iptv/master/streams/in.m3u',
     'https://raw.githubusercontent.com/iptv-org/iptv/master/streams/in_distro.m3u',
     'https://raw.githubusercontent.com/iptv-org/iptv/master/streams/in_doordarshan.m3u',
@@ -93,10 +74,10 @@ def is_indian_channel(channel_name, group, url, tvg_id=''):
     if any(kw.lower() in channel_lower for kw in INDIAN_KEYWORDS):
         return True
     
-    if any(kw.lower() in group_lower for kw in ['hindi', 'punjabi', 'tamil', 'telugu', 'malayalam', 'kannada', 'marathi', 'gujarati', 'bengali', 'indian', 'regional']):
+    if any(kw.lower() in group_lower for kw in ['hindi', 'punjabi', 'tamil', 'telugu', 'malayalam', 'kannada', 'marathi', 'gujarati', 'bengali', 'indian', 'regional', 'indian bangla news', 'kolkata']):
         return True
     
-    if 'samsungin' in url_lower or 'amagi' in url_lower or 'india' in url_lower:
+    if 'samsungin' in url_lower or 'amagi' in url_lower:
         return True
     
     return False
@@ -204,7 +185,7 @@ def validate_streams(playlist, max_workers=30):
     return working_channels
 
 def write_to_file(playlist, output_file, include_credits=False):
-    credit_text = "# India-only IPTV - iptv-org\n"
+    credit_text = "# India-only IPTV\n"
     with open(output_file, 'w') as f:
         f.write("#EXTM3U\n")  
         if include_credits:
